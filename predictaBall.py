@@ -48,17 +48,16 @@ def nextMatchesLDC():
 
         soup2 = BeautifulSoup(html, "html.parser")
         
-        # On cherche ici les prochains matchs
-        forme_equipe1 = soup2.find_all("a", class_="tableCellParticipant__name")
+        participants = soup2.find_all("a", class_="tableCellParticipant__name")
 
-        if forme_equipe1:
+        if participants:
             i = 0
             classement_equipe1 = 1
             classement_equipe2 = 1
             while i < 36:
-                if forme_equipe1[i] == equipe1:
+                if participants[i].text == equipe1:
                     classement_equipe1 += i
-                elif forme_equipe1[i] == equipe2:
+                elif participants[i].text == equipe2:
                     classement_equipe2 += i
                 i += 1
             print("Classement " + equipe1 + " : " + str(classement_equipe1) + '\n' + "Classement " + equipe2 + " : " + str(classement_equipe2))
