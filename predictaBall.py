@@ -34,7 +34,7 @@ def nextMatchesLDC():
         match_choisi = int(input("Choisissez un match : "))
         equipe1 = matchs[match_choisi - 1][0]
         equipe2 = matchs[match_choisi - 1][1]
-        print('\n' + equipe1 + " vs " + equipe2)
+        print('\n' + equipe1 + " vs " + equipe2 + '\n')
 
         url2 = "https://www.flashscore.fr/football/europe/ligue-des-champions/classement/#/UiRZST3U/classements/global/"
 
@@ -48,22 +48,48 @@ def nextMatchesLDC():
 
         soup2 = BeautifulSoup(html, "html.parser")
         
+        # On cherche ici tous les participants dans l'ordre du classement
         participants = soup2.find_all("a", class_="tableCellParticipant__name")
+
+        classement_equipe1 = 1
+        classement_equipe2 = 1
 
         if participants:
             i = 0
-            classement_equipe1 = 1
-            classement_equipe2 = 1
             while i < 36:
-                if participants[i].text == equipe1:
+                if participants[i].text == equipe1: # Si le participant correspond à l'équipe 1 alors on met à jour son classement
                     classement_equipe1 += i
-                elif participants[i].text == equipe2:
+                elif participants[i].text == equipe2: # Pareil pour l'équipe 2
                     classement_equipe2 += i
                 i += 1
             print("Classement " + equipe1 + " : " + str(classement_equipe1) + '\n' + "Classement " + equipe2 + " : " + str(classement_equipe2))
 
+        
+        soup3 = BeautifulSoup(html, "html.parser")
 
+        forme_equipes = soup3.find_all("span", class_="wcl-simpleText_2t3pL wcl-scores-simple-text-01_8lVyp") # On récupère les 5 derniers matchs de tous les participants
+        forme_equipe1 = []
+        forme_equipe2 = []
 
+        j = classement_equipe1 * 5 - 5 # Chaque équipe possède 5 matchs donc on multiplie le classement par 5 puis on retire 5 pour avoir le premier match de l'équipe voulue
+        while j < classement_equipe1 * 5:
+            forme_equipe1.append(forme_equipes[j].text) # On ajoute les matchs de l'équipe choisie dans notre tableau
+            j += 1
+
+        k = classement_equipe2 * 5 - 5
+        while k < classement_equipe2 * 5:
+            forme_equipe2.append(forme_equipes[k].text)
+            k += 1
+        
+        print("\nForme Equipe 1 : ")
+        for element in forme_equipe1:
+            print(element)
+
+        print("Forme Equipe 2 : ")
+        for element in forme_equipe2:
+            print(element)
+
+            
 
 
         # On Ferme le navigateur
