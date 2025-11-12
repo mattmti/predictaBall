@@ -73,23 +73,56 @@ def nextMatchesLDC():
 
         j = classement_equipe1 * 5 - 5 # Chaque équipe possède 5 matchs donc on multiplie le classement par 5 puis on retire 5 pour avoir le premier match de l'équipe voulue
         while j < classement_equipe1 * 5:
-            forme_equipe1.append(forme_equipes[j].text) # On ajoute les matchs de l'équipe choisie dans notre tableau
+            if (forme_equipes[j].text != "?"): # Si un match n'a pas encore été joué on ne l'ajoute pas
+                forme_equipe1.append(forme_equipes[j].text) # On ajoute les matchs de l'équipe choisie dans notre tableau
             j += 1
 
         k = classement_equipe2 * 5 - 5
         while k < classement_equipe2 * 5:
-            forme_equipe2.append(forme_equipes[k].text)
+            if (forme_equipes[k].text != "?"):
+                forme_equipe2.append(forme_equipes[k].text)
             k += 1
         
-        print("\nForme Equipe 1 : ")
+        print("\nForme " + equipe1 + " : ")
         for element in forme_equipe1:
             print(element)
 
-        print("Forme Equipe 2 : ")
+        print("\nForme " + equipe2 + " : ")
         for element in forme_equipe2:
             print(element)
 
-            
+
+        url3 = "https://www.lequipe.fr/Football/ligue-des-champions/page-classement-equipes/general"
+
+        page3 = browser.new_page()
+
+        page3.goto(url3)
+
+        page3.wait_for_timeout(5000)
+
+        html = page3.content()
+
+        soup3 = BeautifulSoup(html, "html.parser")
+        
+        # On cherche ici les buts marqués et encaissés par tous les participants
+        buts_marques = soup3.find_all("td", class_="table__col min--tablet")
+        
+        numero_equipe1_liste = classement_equipe1 * 2 - 2 # Grâce à un petit calcul on retrouve les valeurs qui nous intéressent dans la liste
+        numero_equipe2_liste = classement_equipe2 * 2 - 2
+
+        if buts_marques: # Si on a des valeurs alors on affiche les buts marqués/encaissés et la différence de buts des deux équipes
+            print('\n' + equipe1 + " :")
+            print("Buts marqués : " + buts_marques[numero_equipe1_liste].text)
+            print("Buts encaissés : " + buts_marques[numero_equipe1_liste + 1].text)
+            difference_buts_equipe1 = int(buts_marques[numero_equipe1_liste].text) - int(buts_marques[numero_equipe1_liste + 1].text)
+            print("Différence de buts : " + str(difference_buts_equipe1) + '\n')
+
+            print(equipe2 + " :")
+            print("Buts marqués : " + buts_marques[numero_equipe2_liste].text)
+            print("Buts encaissés : " + buts_marques[numero_equipe2_liste + 1].text)
+            difference_buts_equipe1 = int(buts_marques[numero_equipe2_liste].text) - int(buts_marques[numero_equipe2_liste + 1].text)
+            print("Différence de buts : " + str(difference_buts_equipe1) + '\n')
+        
 
 
         # On Ferme le navigateur
@@ -121,7 +154,6 @@ def nextMatchesPL():
                 print(str(j) + ". " + teams[i].text + " vs " + teams[i+1].text)
                 i += 2
                 j += 1
-
 
         browser.close()
 
