@@ -34,7 +34,7 @@ def nextMatchesLDC():
         match_choisi = int(input("Choisissez un match : "))
         equipe1 = matchs[match_choisi - 1][0]
         equipe2 = matchs[match_choisi - 1][1]
-        print('\n' + equipe1 + " vs " + equipe2 + '\n')
+        print('\n' + equipe1 + " (H) vs " + equipe2 + " (A) " + '\n')
 
         url2 = "https://www.flashscore.fr/football/europe/ligue-des-champions/classement/#/UiRZST3U/classements/global/"
 
@@ -100,9 +100,9 @@ def nextMatchesLDC():
 
         page3.wait_for_timeout(5000)
 
-        html = page3.content()
+        html2 = page3.content()
 
-        soup3 = BeautifulSoup(html, "html.parser")
+        soup3 = BeautifulSoup(html2, "html.parser")
         
         # On cherche ici les buts marqués et encaissés par tous les participants
         buts_marques = soup3.find_all("td", class_="table__col min--tablet")
@@ -124,6 +124,15 @@ def nextMatchesLDC():
             print("Différence de buts : " + str(difference_buts_equipe1) + '\n')
         
 
+        lien_equipes = soup2.find_all("a", class_="tableCellParticipant__name")
+        lien_equipe1 = ""
+        lien_equipe2 = ""
+
+        if lien_equipes:
+            lien_equipe1 = "https://www.flashscore.fr" + lien_equipes[classement_equipe1 - 1]["href"]
+            print("Equipe 1 : " + lien_equipe1)
+            lien_equipe2 = "https://www.flashscore.fr" + lien_equipes[classement_equipe2 - 1]["href"]
+            print("Equipe 2 : " + lien_equipe2)
 
         # On Ferme le navigateur
         browser.close()
