@@ -128,6 +128,9 @@ def nextMatchesLDC():
         lien_equipe1 = ""
         lien_equipe2 = ""
 
+        # Comme les liens vers les pages des équipes ne sont jamais sous la même forme (exemple : https://www.flashscore.fr/equipe)
+        # On vient récupérer directement les url sur les balises <a> en utilisant l'attribut href (celui que l'on veut retrouver)
+        
         if lien_equipes:
             lien_equipe1 = "https://www.flashscore.fr" + lien_equipes[classement_equipe1 - 1]["href"]
             print("Equipe 1 : " + lien_equipe1)
