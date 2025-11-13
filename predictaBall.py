@@ -36,6 +36,19 @@ def nextMatchesLDC():
         equipe2 = matchs[match_choisi - 1][1]
         print('\n' + equipe1 + " (H) vs " + equipe2 + " (A) " + '\n')
 
+        url_match = ""
+        o = 0
+        place_equipe_liste = 0
+
+        while o < 36:
+            if equipe1 == teams[o].text:
+                place_equipe_liste = o // 2
+            o += 1
+
+        matches = soup.find_all("a", class_="eventRowLink")
+        print(matches[place_equipe_liste]["href"]) # On vient récupérer ici l'url de la page du match
+        
+
         url2 = "https://www.flashscore.fr/football/europe/ligue-des-champions/classement/#/UiRZST3U/classements/global/"
 
         page2 = browser.new_page()
@@ -130,12 +143,14 @@ def nextMatchesLDC():
 
         # Comme les liens vers les pages des équipes ne sont jamais sous la même forme (exemple : https://www.flashscore.fr/equipe)
         # On vient récupérer directement les url sur les balises <a> en utilisant l'attribut href (celui que l'on veut retrouver)
-        
+
         if lien_equipes:
             lien_equipe1 = "https://www.flashscore.fr" + lien_equipes[classement_equipe1 - 1]["href"]
             print("Equipe 1 : " + lien_equipe1)
             lien_equipe2 = "https://www.flashscore.fr" + lien_equipes[classement_equipe2 - 1]["href"]
             print("Equipe 2 : " + lien_equipe2)
+
+
 
         # On Ferme le navigateur
         browser.close()
