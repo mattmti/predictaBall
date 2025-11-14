@@ -46,7 +46,7 @@ def nextMatchesLDC():
             o += 1
 
         matches = soup.find_all("a", class_="eventRowLink")
-        print(matches[place_equipe_liste]["href"]) # On vient récupérer ici l'url de la page du match
+        url_match = matches[place_equipe_liste]["href"] # On vient récupérer ici l'url de la page du match
         
 
         url2 = "https://www.flashscore.fr/football/europe/ligue-des-champions/classement/#/UiRZST3U/classements/global/"
@@ -146,9 +146,33 @@ def nextMatchesLDC():
 
         if lien_equipes:
             lien_equipe1 = "https://www.flashscore.fr" + lien_equipes[classement_equipe1 - 1]["href"]
-            print("Equipe 1 : " + lien_equipe1)
+            # print("Equipe 1 : " + lien_equipe1)
             lien_equipe2 = "https://www.flashscore.fr" + lien_equipes[classement_equipe2 - 1]["href"]
-            print("Equipe 2 : " + lien_equipe2)
+            # print("Equipe 2 : " + lien_equipe2)
+
+
+
+        page4 = browser.new_page()
+
+        page4.goto(url_match)
+
+        page4.wait_for_timeout(5000)
+
+        html3 = page4.content()
+
+        soup4 = BeautifulSoup(html3, "html.parser")
+        
+        # On récupère ici les cotes des différents résultats (On prend les cotes de Betclic ici)
+        cotes = soup4.find_all("span", class_="wcl-oddsValue_3e8Cq wcl-large_T25VF wcl-oddsValue_jvPMg")
+
+        cote_equipe1 = cotes[0].text
+        cote_match_nul = cotes[1].text
+        cote_equipe2 = cotes[2].text
+
+        print("Cote Victoire " + equipe1 + " : " + cote_equipe1)
+        print("Cote Match Nul : " + cote_match_nul)
+        print("Cote Victoire " + equipe2 + " : " + cote_equipe2)
+
 
 
 
