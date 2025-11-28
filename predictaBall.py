@@ -84,14 +84,14 @@ def nextMatchesLDC():
         forme_equipe1 = []
         forme_equipe2 = []
 
-        j = classement_equipe1 * 5 - 5 # Chaque équipe possède 5 matchs donc on multiplie le classement par 5 puis on retire 5 pour avoir le premier match de l'équipe voulue
-        while j < classement_equipe1 * 5:
+        j = classement_equipe1 * 6 - 6 # Chaque équipe possède 5 matchs (+ le prochain match noté "?") donc on multiplie le classement par 5 puis on retire 5 pour avoir le premier match de l'équipe voulue
+        while j < classement_equipe1 * 6:
             if (forme_equipes[j].text != "?"): # Si un match n'a pas encore été joué on ne l'ajoute pas
                 forme_equipe1.append(forme_equipes[j].text) # On ajoute les matchs de l'équipe choisie dans notre tableau
             j += 1
 
-        k = classement_equipe2 * 5 - 5
-        while k < classement_equipe2 * 5:
+        k = classement_equipe2 * 6 - 6
+        while k < classement_equipe2 * 6:
             if (forme_equipes[k].text != "?"):
                 forme_equipe2.append(forme_equipes[k].text)
             k += 1
@@ -162,12 +162,12 @@ def nextMatchesLDC():
 
         soup4 = BeautifulSoup(html3, "html.parser")
         
-        # On récupère ici les cotes des différents résultats (On prend les cotes de Betclic ici)
-        cotes = soup4.find_all("span", class_="wcl-oddsValue_3e8Cq wcl-large_T25VF wcl-oddsValue_jvPMg")
+        # On récupère ici les cotes des différents résultats
+        cotes = soup4.find_all("span", class_="wcl-oddsValue_3e8Cq wcl-large_T25VF wcl-highlighted_-Gt5I wcl-oddsValue_jvPMg")
 
         cote_equipe1 = cotes[0].text
-        cote_match_nul = cotes[1].text
-        cote_equipe2 = cotes[2].text
+        cote_match_nul = cotes[2].text
+        cote_equipe2 = cotes[3].text
 
         print("Cote Victoire " + equipe1 + " : " + cote_equipe1)
         print("Cote Match Nul : " + cote_match_nul)
