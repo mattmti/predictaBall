@@ -347,46 +347,84 @@ class FootballPredictor:
                 assists_info = f" - {assists} passes" if assists > 0 else ""
                 print(f"  {i}. {scorer['name']}: {scorer['goals']} buts{penalties_info}{assists_info}")
 
-        # Calcul du pronostic amélioré
-        score_home = 0
-        score_away = 0
+        score_home = 50  # Base de 50 points pour chaque équipe
+        score_away = 50
+        score_draw = 30  # Base pour le match nul
         
-        # Bonus domicile
-        score_home += 5
+        # 1. BONUS DOMICILE
+        score_home += 10
         
-        # Points au classement
-        score_home += home_stats.get('points', 0) / 10
-        score_away += away_stats.get('points', 0) / 10
+        # 2. POINTS AU CLASSEMENT (impact modéré)
+        home_points = home_stats.get('points', 0)
+        away_points = away_stats.get('points', 0)
+        score_home += home_points * 0.5
+        score_away += away_points * 0.5
         
-        # Position au classement (inversé)
-        score_home += (21 - home_stats.get('position', 10)) / 2
-        score_away += (21 - away_stats.get('position', 10)) / 2
+        # 3. POSITION AU CLASSEMENT
+        home_pos = home_stats.get('position', 10)
+        away_pos = away_stats.get('position', 10)
+        score_home += (21 - home_pos) * 2
+        score_away += (21 - away_pos) * 2
         
-        # Différence de buts
-        score_home += home_stats.get('goalDifference', 0) / 5
-        score_away += away_stats.get('goalDifference', 0) / 5
+        # 4. DIFFÉRENCE DE BUTS (force offensive/défensive)
+        home_diff = home_stats.get('goalDifference', 0)
+        away_diff = away_stats.get('goalDifference', 0)
+        score_home += home_diff * 0.8
+        score_away += away_diff * 0.8
         
-        # Forme récente réelle (pondération importante)
-        score_home += home_forme['points'] * 1.5  # Coefficient augmenté
-        score_away += away_forme['points'] * 1.5
+        # 5. FORME RÉCENTE (très important)
+        score_home += home_forme['points'] * 2
+        score_away += away_forme['points'] * 2
         
-        # Bonus pour série de victoires
+        # Bonus/malus pour séries
         if home_forme['forme_str'].count('V') >= 3:
-            score_home += 3
+            score_home += 8
         if away_forme['forme_str'].count('V') >= 3:
-            score_away += 3
+            score_away += 8
         
-        # Malus pour série de défaites
         if home_forme['forme_str'].count('D') >= 3:
-            score_home -= 2
+            score_home -= 5
         if away_forme['forme_str'].count('D') >= 3:
-            score_away -= 2
+            score_away -= 5
         
-        # Calcul des probabilités
-        total = score_home + score_away
-        prob_home = (score_home / total * 100) if total > 0 else 33.33
-        prob_away = (score_away / total * 100) if total > 0 else 33.33
-        prob_draw = 100 - prob_home - prob_away
+        # Bonus pour les matchs nuls récents (augmente prob de nul)
+        home_draws = home_forme['forme_str'].count('N')
+        away_draws = away_forme['forme_str'].count('N')
+        score_draw += (home_draws + away_draws) * 3
+        
+        # 6. ÉCART ENTRE LES ÉQUIPES
+        # Si les équipes sont proches au classement ou en forme, augmenter prob de nul
+        diff_position = abs(home_pos - away_pos)
+        diff_points = abs(home_points - away_points)
+        
+        if diff_position <= 3:  # Équipes très proches au classement
+            score_draw += 10
+        elif diff_position <= 6:  # Équipes assez proches
+            score_draw += 5
+        
+        if diff_points <= 5:  # Écart de points faible
+            score_draw += 8
+        elif diff_points <= 10:
+            score_draw += 4
+        
+        # Si les formes sont similaires
+        if abs(home_forme['points'] - away_forme['points']) <= 3:
+            score_draw += 6
+        
+        # 7. HISTORIQUE DES CONFRONTATIONS DIRECTES
+        # (Si disponible - sera ajouté plus tard dans le code)
+        
+        # 8. AJUSTEMENT SELON LA QUALITÉ DES ÉQUIPES
+        # Les meilleures équipes ont plus de mal à se départager
+        avg_position = (home_pos + away_pos) / 2
+        if avg_position <= 5:  # Top 5
+            score_draw += 5
+        
+        # 9. NORMALISATION ET CALCUL DES PROBABILITÉS
+        total = score_home + score_away + score_draw
+        prob_home = (score_home / total * 100)
+        prob_away = (score_away / total * 100)
+        prob_draw = (score_draw / total * 100)
         
         print(f"\n{'='*60}")
         print("PRONOSTICS")
@@ -400,14 +438,22 @@ class FootballPredictor:
         print("RECOMMANDATION")
         print(f"{'='*60}")
         
-        if prob_home > 50:
-            confiance = 'Élevée' if prob_home > 60 else 'Moyenne'
+        max_prob = max(prob_home, prob_draw, prob_away)
+        
+        if max_prob == prob_home:
+            confiance = 'Élevée' if prob_home > 50 else 'Moyenne' if prob_home > 40 else 'Faible'
             print(f"✓ Victoire de {home_team} (Confiance: {confiance})")
-        elif prob_away > 50:
-            confiance = 'Élevée' if prob_away > 60 else 'Moyenne'
+        elif max_prob == prob_away:
+            confiance = 'Élevée' if prob_away > 50 else 'Moyenne' if prob_away > 40 else 'Faible'
             print(f"✓ Victoire de {away_team} (Confiance: {confiance})")
         else:
-            print(f"✓ Match serré - Match nul possible ou victoire courte")
+            confiance = 'Élevée' if prob_draw > 40 else 'Moyenne' if prob_draw > 33 else 'Faible'
+            print(f"✓ Match nul probable (Confiance: {confiance})")
+        
+        # Analyser l'écart entre les probabilités
+        probs_sorted = sorted([prob_home, prob_draw, prob_away], reverse=True)
+        if probs_sorted[0] - probs_sorted[1] < 10:
+            print(f"  ⚠ Les probabilités sont très serrées - match incertain")
         
         # Pronostic buts basé sur la forme récente
         avg_goals_home = home_forme['buts_marques'] / max(home_forme['nb_matchs'], 1)
