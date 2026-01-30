@@ -80,6 +80,92 @@ class FootballPredictor:
         except requests.exceptions.RequestException as e:
             print(f"Erreur lors de la récupération de l'historique: {e}")
             return []
+        
+
+    def analyser_h2h(self, match_id, home_team, away_team):
+        #Analyse les confrontations directes entre deux équipes
+        url = f"{self.base_url}/matches/{match_id}/head2head"
+        params = {"limit": 10}  # On récupère les 10 dernières confrontations
+        
+        try:
+            response = requests.get(url, headers=self.headers, params=params)
+            response.raise_for_status()
+            data = response.json()
+            h2h_matches = data.get("matches", [])
+            
+            if not h2h_matches:
+                return None
+            
+            # Limiter aux 5 dernières confrontations
+            h2h_matches = h2h_matches[:5]
+            
+            # Analyser les résultats
+            stats = {
+                "victoires_home": 0,
+                "victoires_away": 0,
+                "nuls": 0,
+                "buts_home": 0,
+                "buts_away": 0,
+                "matchs": []
+            }
+            
+            for match in h2h_matches:
+                home = match["homeTeam"]["name"]
+                away = match["awayTeam"]["name"]
+                home_score = match["score"]["fullTime"]["home"]
+                away_score = match["score"]["fullTime"]["away"]
+                date = match["utcDate"][:10]
+                competition = match["competition"]["name"]
+                
+                # Déterminer le résultat du point de vue de home_team (l'équipe à domicile du match analysé)
+                if home == home_team:
+                    stats["buts_home"] += home_score
+                    stats["buts_away"] += away_score
+                    if home_score > away_score:
+                        stats["victoires_home"] += 1
+                        resultat = f"✓ {home_team}"
+                    elif home_score < away_score:
+                        stats["victoires_away"] += 1
+                        resultat = f"✓ {away_team}"
+                    else:
+                        stats["nuls"] += 1
+                        resultat = "Match nul"
+                    
+                    stats["matchs"].append({
+                        "date": date,
+                        "competition": competition,
+                        "home": home,
+                        "away": away,
+                        "score": f"{home_score}-{away_score}",
+                        "resultat": resultat
+                    })
+                else:  # away == home_team (inversion des équipes)
+                    stats["buts_home"] += away_score
+                    stats["buts_away"] += home_score
+                    if away_score > home_score:
+                        stats["victoires_home"] += 1
+                        resultat = f"✓ {home_team}"
+                    elif away_score < home_score:
+                        stats["victoires_away"] += 1
+                        resultat = f"✓ {away_team}"
+                    else:
+                        stats["nuls"] += 1
+                        resultat = "Match nul"
+                    
+                    stats["matchs"].append({
+                        "date": date,
+                        "competition": competition,
+                        "home": home,
+                        "away": away,
+                        "score": f"{home_score}-{away_score}",
+                        "resultat": resultat
+                    })
+            
+            return stats
+            
+        except requests.exceptions.RequestException as e:
+            print(f"Erreur lors de la récupération des confrontations directes: {e}")
+            return None     
     
     def calculer_forme_detaillee(self, matchs, team_name):
         """Calcule la forme récente détaillée d'une équipe"""
@@ -144,6 +230,7 @@ class FootballPredictor:
         away_team = match["awayTeam"]["name"]
         home_team_id = match["homeTeam"]["id"]
         away_team_id = match["awayTeam"]["id"]
+        match_id = match["id"]
         
         # Récupération des statistiques
         home_stats = classement.get(home_team, {})
@@ -186,6 +273,24 @@ class FootballPredictor:
         print(f"  Bilan: {away_forme['victoires']}V - {away_forme['nuls']}N - {away_forme['defaites']}D")
         print(f"  Buts: {away_forme['buts_marques']} marqués - {away_forme['buts_encaisses']} encaissés")
         print(f"  Points: {away_forme['points']}")
+
+        h2h_stats = self.analyser_h2h(match_id, home_team, away_team)
+
+        if h2h_stats:
+            print(f"\n{'='*60}")
+            print("CONFRONTATIONS DIRECTES (5 derniers matchs)")
+            print(f"{'='*60}")
+            print(f"Bilan: {home_team} {h2h_stats['victoires_home']}V - {h2h_stats['nuls']}N - {h2h_stats['victoires_away']}V {away_team}")
+            print(f"Buts totaux: {home_team} {h2h_stats['buts_home']} - {h2h_stats['buts_away']} {away_team}")
+            print(f"Moyenne buts/match: {(h2h_stats['buts_home'] + h2h_stats['buts_away']) / len(h2h_stats['matchs']):.1f}")
+            print(f"\nHistorique des matchs:")
+            for m in h2h_stats['matchs']:
+                print(f"    {m['home']} {m['score']} {m['away']}")
+        else:
+            print(f"\n{'='*60}")
+            print("CONFRONTATIONS DIRECTES")
+            print(f"{'='*60}")
+            print("Aucune confrontation récente trouvée entre ces équipes")
 
         # Calcul du pronostic amélioré
         score_home = 0
