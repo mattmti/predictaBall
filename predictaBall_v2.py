@@ -81,6 +81,38 @@ class FootballPredictor:
             print(f"Erreur lors de la récupération de l'historique: {e}")
             return []
         
+    def obtenir_buteurs_competition(self, league_code, team_name, limit=3):
+        """Récupère les meilleurs buteurs d'une équipe via les stats de la compétition"""
+        url = f"{self.base_url}/competitions/{league_code}/scorers"
+        params = {"limit": 50}  # On récupère le top 50 pour être sûr d'avoir les joueurs de l'équipe
+        
+        try:
+            response = requests.get(url, headers=self.headers, params=params)
+            response.raise_for_status()
+            data = response.json()
+            
+            scorers = data.get("scorers", [])
+            
+            # Filtrer les buteurs de l'équipe concernée
+            team_scorers = []
+            for scorer in scorers:
+                if scorer["team"]["name"] == team_name:
+                    team_scorers.append({
+                        "name": scorer["player"]["name"],
+                        "goals": scorer["goals"],
+                        "assists": scorer.get("assists", 0),
+                        "penalties": scorer.get("penalties", 0)
+                    })
+                    
+                    if len(team_scorers) >= limit:
+                        break
+            
+            return team_scorers if team_scorers else None
+            
+        except requests.exceptions.RequestException as e:
+            print(f"Erreur lors de la récupération des buteurs: {e}")
+            return None
+        
 
     def analyser_h2h(self, match_id, home_team, away_team):
         #Analyse les confrontations directes entre deux équipes
@@ -224,7 +256,7 @@ class FootballPredictor:
             "nb_matchs": len(matchs[:5])
         }
     
-    def analyser_match(self, match, classement):
+    def analyser_match(self, match, classement, league_code):
         """Analyse un match et calcule les pronostics"""
         home_team = match["homeTeam"]["name"]
         away_team = match["awayTeam"]["name"]
@@ -279,7 +311,7 @@ class FootballPredictor:
         if h2h_stats:
             print(f"\n{'='*60}")
             print("CONFRONTATIONS DIRECTES (5 derniers matchs)")
-            print(f"{'='*60}")
+            print(f"{'='*60}\n")
             print(f"Bilan: {home_team} {h2h_stats['victoires_home']}V - {h2h_stats['nuls']}N - {h2h_stats['victoires_away']}V {away_team}")
             print(f"Buts totaux: {home_team} {h2h_stats['buts_home']} - {h2h_stats['buts_away']} {away_team}")
             print(f"Moyenne buts/match: {(h2h_stats['buts_home'] + h2h_stats['buts_away']) / len(h2h_stats['matchs']):.1f}")
@@ -289,8 +321,31 @@ class FootballPredictor:
         else:
             print(f"\n{'='*60}")
             print("CONFRONTATIONS DIRECTES")
-            print(f"{'='*60}")
+            print(f"{'='*60}\n")
             print("Aucune confrontation récente trouvée entre ces équipes")
+
+        home_scorers = self.obtenir_buteurs_competition(league_code, home_team, limit=3)
+        away_scorers = self.obtenir_buteurs_competition(league_code, away_team, limit=3)
+        
+        if home_scorers:
+            print(f"\n{'='*60}")
+            print("MEILLEURS BUTEURS PAR EQUIPE :")
+            print(f"{'='*60}\n")
+            for i, scorer in enumerate(home_scorers, 1):
+                penalties = scorer.get('penalties') or 0
+                assists = scorer.get('assists') or 0
+                penalties_info = f" ({penalties} pen.)" if penalties > 0 else ""
+                assists_info = f" - {assists} passes" if assists > 0 else ""
+                print(f"  {i}. {scorer['name']}: {scorer['goals']} buts{penalties_info}{assists_info}")
+
+        if away_scorers:
+            print("\n")
+            for i, scorer in enumerate(away_scorers, 1):
+                penalties = scorer.get('penalties') or 0
+                assists = scorer.get('assists') or 0
+                penalties_info = f" ({penalties} pen.)" if penalties > 0 else ""
+                assists_info = f" - {assists} passes" if assists > 0 else ""
+                print(f"  {i}. {scorer['name']}: {scorer['goals']} buts{penalties_info}{assists_info}")
 
         # Calcul du pronostic amélioré
         score_home = 0
@@ -380,7 +435,6 @@ class FootballPredictor:
         """Fonction principale"""
         print("\n" + "="*60)
         print("ANALYSEUR DE MATCHS ET PRONOSTICS FOOTBALL")
-        print("Version 3.0 - Avec forme réelle des équipes")
         print("="*60)
         
         self.afficher_championnats()
@@ -407,10 +461,9 @@ class FootballPredictor:
         print(f"PROCHAINS MATCHS - {league['name']}")
         print(f"{'='*60}")
         for i, match in enumerate(matchs, 1):
-            date = match['utcDate'][:10]
             home = match['homeTeam']['name']
             away = match['awayTeam']['name']
-            print(f"{i}. {date} - {home} vs {away}")
+            print(f"{i}. {home} vs {away}")
         
         # Choix du match
         match_choix = input(f"\nChoisissez un match à analyser (1-{len(matchs)}): ")
@@ -429,7 +482,7 @@ class FootballPredictor:
         classement = self.obtenir_classement(league['code'])
         
         # Analyse du match
-        self.analyser_match(matchs[match_idx], classement)
+        self.analyser_match(matchs[match_idx], classement, league['code'])
 
 
 if __name__ == "__main__":
