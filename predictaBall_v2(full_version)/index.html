@@ -36,7 +36,6 @@
       overflow-x: hidden;
     }
 
-    /* ─── BACKGROUND GRID ─── */
     body::before {
       content: '';
       position: fixed;
@@ -51,7 +50,6 @@
 
     .app-wrapper { position: relative; z-index: 1; }
 
-    /* ─── HEADER ─── */
     header {
       border-bottom: 1px solid var(--border);
       background: rgba(8,12,15,0.95);
@@ -106,14 +104,12 @@
       letter-spacing: 0.1em;
     }
 
-    /* ─── MAIN LAYOUT ─── */
     .main {
       max-width: 1280px;
       margin: 0 auto;
       padding: 40px 32px;
     }
 
-    /* ─── SECTION TITLE ─── */
     .section-label {
       font-family: var(--font-mono);
       font-size: 0.7rem;
@@ -132,7 +128,6 @@
       line-height: 1;
     }
 
-    /* ─── LEAGUE GRID ─── */
     .league-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -193,7 +188,6 @@
       margin-top: 4px;
     }
 
-    /* ─── MATCHES LIST ─── */
     .matches-section { margin-bottom: 48px; }
 
     .match-item {
@@ -276,7 +270,6 @@
       box-shadow: 0 0 16px rgba(0,255,135,0.2);
     }
 
-    /* ─── ANALYSIS PANEL ─── */
     .analysis-panel {
       animation: fadeInUp 0.4s ease;
     }
@@ -286,7 +279,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ─── PREDICTION HERO ─── */
     .prediction-hero {
       background: var(--card);
       border: 1px solid var(--border);
@@ -303,6 +295,31 @@
       top: 0; left: 0; right: 0;
       height: 2px;
       background: linear-gradient(90deg, transparent, var(--green), transparent);
+    }
+
+    /* NOUVEAU - Badge importance */
+    .importance-badge {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 12px;
+      background: rgba(0,255,135,0.05);
+      border: 1px solid rgba(0,255,135,0.2);
+      border-radius: 8px;
+    }
+
+    .importance-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      margin-bottom: 4px;
+    }
+
+    .importance-value {
+      font-family: var(--font-title);
+      font-size: 1.2rem;
+      letter-spacing: 0.05em;
+      color: var(--green);
     }
 
     .teams-header {
@@ -359,7 +376,6 @@
       letter-spacing: 0.1em;
     }
 
-    /* ─── PROBABILITY BARS ─── */
     .proba-section { margin-bottom: 28px; }
 
     .proba-row {
@@ -425,7 +441,6 @@
       color: var(--yellow);
     }
 
-    /* ─── RECOMMENDATION BADGE ─── */
     .recommendation-card {
       background: rgba(0,255,135,0.07);
       border: 1px solid rgba(0,255,135,0.3);
@@ -441,6 +456,30 @@
       font-size: 1.4rem;
       letter-spacing: 0.05em;
       color: var(--green);
+    }
+
+    /* NOUVEAU - Affichage de la côte */
+    .odds-display {
+      margin-top: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .odds-value {
+      background: rgba(0,255,135,0.15);
+      padding: 4px 10px;
+      border-radius: 6px;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .bookmaker-name {
+      color: var(--muted);
+      font-size: 0.75rem;
     }
 
     .conf-badge {
@@ -467,7 +506,52 @@
       display: inline-block;
     }
 
-    /* ─── STATS GRID ─── */
+    /* NOUVEAU - Section côtes bookmakers */
+    .odds-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .odds-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .odds-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .odds-card-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      margin-bottom: 8px;
+    }
+
+    .odds-card-value {
+      font-family: var(--font-title);
+      font-size: 1.8rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .odds-card-bookmaker {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--green);
+    }
+
     .stats-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -515,7 +599,52 @@
       font-weight: 700;
     }
 
-    /* ─── FORME ─── */
+    /* NOUVEAU - Section blessures */
+    .injuries-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .injury-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 0.85rem;
+    }
+
+    .injury-icon {
+      font-size: 1rem;
+    }
+
+    .injury-player {
+      flex: 1;
+      color: var(--text);
+    }
+
+    .injury-type {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--red);
+      background: rgba(255,62,91,0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .no-injuries {
+      color: var(--green);
+      font-size: 0.85rem;
+      padding: 8px 0;
+    }
+
+    /* NOUVEAU - Stats avancées (xG, discipline) */
+    .advanced-stats {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
     .form-dots { display: flex; gap: 6px; margin-top: 8px; }
 
     .form-dot {
@@ -534,7 +663,6 @@
     .form-dot.N { background: rgba(255,215,0,0.1); color: var(--yellow); border: 1px solid rgba(255,215,0,0.3); }
     .form-dot.D { background: rgba(255,62,91,0.1); color: var(--red); border: 1px solid rgba(255,62,91,0.3); }
 
-    /* ─── BETTING INSIGHTS ─── */
     .insights-row {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -575,7 +703,6 @@
     .insight-value.no { color: var(--red); }
     .insight-value.neutral { color: var(--text); }
 
-    /* ─── H2H ─── */
     .h2h-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -620,7 +747,6 @@
     .h2h-score-cell { font-family: var(--font-mono); font-weight: 700; color: var(--text); }
     .h2h-result { font-family: var(--font-mono); font-size: 0.7rem; color: var(--green); text-align: right; min-width: 120px; }
 
-    /* ─── SCORERS ─── */
     .scorers-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -654,7 +780,6 @@
       font-weight: 700;
     }
 
-    /* ─── LOADERS ─── */
     .loader {
       display: flex;
       flex-direction: column;
@@ -682,7 +807,6 @@
       letter-spacing: 0.15em;
     }
 
-    /* ─── EMPTY ─── */
     .empty-state {
       text-align: center;
       padding: 60px 20px;
@@ -692,10 +816,9 @@
     .empty-icon { font-size: 3rem; margin-bottom: 16px; }
     .empty-text { font-family: var(--font-title); font-size: 1.4rem; letter-spacing: 0.05em; }
 
-    /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       .main { padding: 24px 16px; }
-      .stats-grid, .scorers-grid, .insights-row { grid-template-columns: 1fr; }
+      .stats-grid, .scorers-grid, .insights-row, .odds-grid { grid-template-columns: 1fr; }
       .section-title { font-size: 2rem; }
       .teams-header { gap: 16px; }
       .team-name-hero { font-size: 1.2rem; }
@@ -703,7 +826,6 @@
       header { padding: 0 16px; }
     }
 
-    /* ─── DIVIDERS ─── */
     .divider {
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--border), transparent);
@@ -818,6 +940,12 @@
 
           <!-- HERO -->
           <div class="prediction-hero">
+            <!-- NOUVEAU - Importance du match -->
+            <div class="importance-badge" v-if="analysis.match_importance">
+              <div class="importance-label">IMPORTANCE DU MATCH</div>
+              <div class="importance-value">⚡ {{ analysis.match_importance }}</div>
+            </div>
+
             <div class="teams-header">
               <div class="team-block">
                 <img v-if="analysis.home_crest" :src="analysis.home_crest" class="team-crest" :alt="analysis.home_team" />
@@ -859,9 +987,37 @@
               <div>
                 <div style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); letter-spacing: 0.15em; margin-bottom: 4px;">PRONOSTIC RECOMMANDÉ</div>
                 <div class="rec-main">✓ {{ analysis.recommendation }}</div>
+                <!-- NOUVEAU - Affichage de la meilleure côte -->
+                <div class="odds-display" v-if="analysis.recommended_odd">
+                  💰 Meilleure côte : 
+                  <span class="odds-value">{{ analysis.recommended_odd }}</span>
+                  <span class="bookmaker-name">{{ analysis.recommended_bookmaker }}</span>
+                </div>
                 <div v-if="analysis.tight_match" class="tight-warning">⚠ Probabilités serrées — match incertain</div>
               </div>
               <div :class="['conf-badge', analysis.confidence]">{{ analysis.confidence }}</div>
+            </div>
+          </div>
+
+          <!-- NOUVEAU - Section côtes complètes -->
+          <div class="odds-section" v-if="analysis.best_odds">
+            <div class="stat-card-title">💰 MEILLEURES CÔTES DES BOOKMAKERS</div>
+            <div class="odds-grid">
+              <div class="odds-card">
+                <div class="odds-card-label">VICTOIRE {{ analysis.home_team.toUpperCase() }}</div>
+                <div class="odds-card-value">{{ analysis.best_odds.home }}</div>
+                <div class="odds-card-bookmaker">{{ analysis.bookmakers.home }}</div>
+              </div>
+              <div class="odds-card">
+                <div class="odds-card-label">MATCH NUL</div>
+                <div class="odds-card-value">{{ analysis.best_odds.draw }}</div>
+                <div class="odds-card-bookmaker">{{ analysis.bookmakers.draw }}</div>
+              </div>
+              <div class="odds-card">
+                <div class="odds-card-label">VICTOIRE {{ analysis.away_team.toUpperCase() }}</div>
+                <div class="odds-card-value">{{ analysis.best_odds.away }}</div>
+                <div class="odds-card-bookmaker">{{ analysis.bookmakers.away }}</div>
+              </div>
             </div>
           </div>
 
@@ -911,8 +1067,35 @@
                 <div class="stat-row"><span class="stat-key">Buts marqués</span><span class="stat-val">{{ analysis.home_stats.goalsFor }}</span></div>
                 <div class="stat-row"><span class="stat-key">Buts encaissés</span><span class="stat-val">{{ analysis.home_stats.goalsAgainst }}</span></div>
                 <div class="stat-row"><span class="stat-key">Diff. buts</span><span class="stat-val">{{ formatDiff(analysis.home_stats.goalDifference) }}</span></div>
-                <div class="stat-row"><span class="stat-key">B / N / D</span><span class="stat-val">{{ analysis.home_stats.wins }}V {{ analysis.home_stats.draws }}N {{ analysis.home_stats.losses }}D</span></div>
+                <div class="stat-row"><span class="stat-key">V / N / D</span><span class="stat-val">{{ analysis.home_stats.wins }}V {{ analysis.home_stats.draws }}N {{ analysis.home_stats.losses }}D</span></div>
               </div>
+              
+              <!-- NOUVEAU - Stats avancées (xG, discipline) -->
+              <div class="advanced-stats" v-if="analysis.home_advanced">
+                <div class="stat-card-title" style="margin-bottom:8px">📈 STATS AVANCÉES</div>
+                <div class="stat-rows">
+                  <div class="stat-row"><span class="stat-key">xG moyen (pour)</span><span class="stat-val">{{ analysis.home_advanced.xg_for }}</span></div>
+                  <div class="stat-row"><span class="stat-key">xG moyen (contre)</span><span class="stat-val">{{ analysis.home_advanced.xg_against }}</span></div>
+                  <div class="stat-row"><span class="stat-key">🟨 Cartons jaunes</span><span class="stat-val">{{ analysis.home_advanced.yellow_cards }}</span></div>
+                  <div class="stat-row"><span class="stat-key">🟥 Cartons rouges</span><span class="stat-val">{{ analysis.home_advanced.red_cards }}</span></div>
+                </div>
+              </div>
+
+              <!-- NOUVEAU - Blessures -->
+              <div class="injuries-section" v-if="analysis.home_injuries">
+                <div class="stat-card-title" style="margin-bottom:8px">🏥 BLESSURES</div>
+                <div v-if="analysis.home_injuries.length === 0" class="no-injuries">
+                  ✅ Aucune blessure majeure
+                </div>
+                <div v-else>
+                  <div v-for="injury in analysis.home_injuries" :key="injury.player" class="injury-item">
+                    <span class="injury-icon">❌</span>
+                    <span class="injury-player">{{ injury.player }}</span>
+                    <span class="injury-type">{{ injury.type }}</span>
+                  </div>
+                </div>
+              </div>
+
               <div style="margin-top: 16px;">
                 <div class="stat-card-title" style="margin-bottom:8px">FORME RÉCENTE</div>
                 <div class="form-dots">
@@ -930,8 +1113,35 @@
                 <div class="stat-row"><span class="stat-key">Buts marqués</span><span class="stat-val">{{ analysis.away_stats.goalsFor }}</span></div>
                 <div class="stat-row"><span class="stat-key">Buts encaissés</span><span class="stat-val">{{ analysis.away_stats.goalsAgainst }}</span></div>
                 <div class="stat-row"><span class="stat-key">Diff. buts</span><span class="stat-val">{{ formatDiff(analysis.away_stats.goalDifference) }}</span></div>
-                <div class="stat-row"><span class="stat-key">B / N / D</span><span class="stat-val">{{ analysis.away_stats.wins }}V {{ analysis.away_stats.draws }}N {{ analysis.away_stats.losses }}D</span></div>
+                <div class="stat-row"><span class="stat-key">V / N / D</span><span class="stat-val">{{ analysis.away_stats.wins }}V {{ analysis.away_stats.draws }}N {{ analysis.away_stats.losses }}D</span></div>
               </div>
+
+              <!-- NOUVEAU - Stats avancées (xG, discipline) -->
+              <div class="advanced-stats" v-if="analysis.away_advanced">
+                <div class="stat-card-title" style="margin-bottom:8px">📈 STATS AVANCÉES</div>
+                <div class="stat-rows">
+                  <div class="stat-row"><span class="stat-key">xG moyen (pour)</span><span class="stat-val">{{ analysis.away_advanced.xg_for }}</span></div>
+                  <div class="stat-row"><span class="stat-key">xG moyen (contre)</span><span class="stat-val">{{ analysis.away_advanced.xg_against }}</span></div>
+                  <div class="stat-row"><span class="stat-key">🟨 Cartons jaunes</span><span class="stat-val">{{ analysis.away_advanced.yellow_cards }}</span></div>
+                  <div class="stat-row"><span class="stat-key">🟥 Cartons rouges</span><span class="stat-val">{{ analysis.away_advanced.red_cards }}</span></div>
+                </div>
+              </div>
+
+              <!-- NOUVEAU - Blessures -->
+              <div class="injuries-section" v-if="analysis.away_injuries">
+                <div class="stat-card-title" style="margin-bottom:8px">🏥 BLESSURES</div>
+                <div v-if="analysis.away_injuries.length === 0" class="no-injuries">
+                  ✅ Aucune blessure majeure
+                </div>
+                <div v-else>
+                  <div v-for="injury in analysis.away_injuries" :key="injury.player" class="injury-item">
+                    <span class="injury-icon">❌</span>
+                    <span class="injury-player">{{ injury.player }}</span>
+                    <span class="injury-type">{{ injury.type }}</span>
+                  </div>
+                </div>
+              </div>
+
               <div style="margin-top: 16px;">
                 <div class="stat-card-title" style="margin-bottom:8px">FORME RÉCENTE</div>
                 <div class="form-dots">
@@ -1039,14 +1249,12 @@ createApp({
       }
     })
 
-    // Retour vers la liste des championnats — recharge la liste si on change de championnat
     const goBackToLeagues = () => {
       analysis.value = null
       error.value = ''
       step.value = 'leagues'
     }
 
-    // Retour vers la liste des matchs — NE recharge PAS les matchs, garde l'état
     const goBackToMatches = () => {
       analysis.value = null
       error.value = ''
@@ -1054,7 +1262,6 @@ createApp({
     }
 
     const selectLeague = async (id, league) => {
-      // Reset complet à chaque changement de championnat
       selectedLeague.value = { id, ...league }
       matches.value = []
       selectedMatch.value = null
@@ -1074,7 +1281,6 @@ createApp({
     }
 
     const analyzeMatch = async (match) => {
-      // Reset propre avant chaque nouvelle analyse
       selectedMatch.value = match
       analysis.value = null
       error.value = ''
