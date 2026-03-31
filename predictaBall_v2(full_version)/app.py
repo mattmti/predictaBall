@@ -15,14 +15,12 @@ def index():
 BASE_URL = "https://api.football-data.org/v4"
 HEADERS = {"X-Auth-Token": "5bce38997bd948849ceb02b50334bc6f"}
 
-# API-Football (RapidAPI) pour xG, blessures, discipline
 RAPID_API_KEY = "609aaf31f8mshd5507353f83b325p1905c3jsn9e9003baada"
 RAPID_HEADERS = {
     "X-RapidAPI-Key": RAPID_API_KEY,
     "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com"
 }
 
-# The Odds API pour les côtes
 ODDS_API_KEY = "f5b6789547836224ae8b1d471b95134f"
 
 LEAGUES = {
@@ -52,36 +50,21 @@ def api_get(path, params=None):
         print(f"[ERROR] {path} - {e}")
         return None
 
-def obtenir_blessures(team_id, rapid_league_id, saison="2024"):
-    """Récupère les blessures via API-Football ou génère des données de démo"""
-    if RAPID_API_KEY == "VOTRE_CLE_RAPIDAPI_ICI":
-        return generer_blessures_demo()
-    
-    try:
-        url = "https://api-football-v1.p.rapidapi.com/v3/injuries"
-        params = {"team": team_id, "league": rapid_league_id, "season": saison}
-        r = requests.get(url, headers=RAPID_HEADERS, params=params, timeout=10)
-        r.raise_for_status()
-        data = r.json()
-        injuries = data.get("response", [])
-        return [
-            {
-                "player": injury["player"]["name"],
-                "type": injury["player"]["type"],
-                "reason": injury["player"]["reason"]
-            }
-            for injury in injuries if injury["player"]["type"] != "Missing"
-        ][:5]  # Max 5 blessures
-    except Exception as e:
-        print(f"[BLESSURES] Erreur: {e}")
-        return generer_blessures_demo()
+def obtenir_blessures(team_name, rapid_league_id, saison="2024"):
+    """
+    Récupère les blessures via API-Football en mode démo
+    Note: L'API gratuite a des limites strictes, donc on utilise des données de démo
+    Pour une version production, il faudrait une clé API payante
+    """
+    print(f"[BLESSURES] Mode démo pour {team_name}")
+    return generer_blessures_demo()
 
 def generer_blessures_demo():
     """Génère des blessures de démonstration"""
     nb_blessures = random.randint(0, 3)
-    types_blessures = ["Blessure musculaire", "Cheville", "Genou", "Ischio-jambiers", "Aine"]
-    prenoms = ["Lucas", "Antoine", "Thomas", "Alexandre", "Nicolas", "Pierre", "Julien"]
-    noms = ["Martin", "Bernard", "Dubois", "Moreau", "Simon", "Laurent", "Leroy"]
+    types_blessures = ["Blessure musculaire", "Cheville", "Genou", "Ischio-jambiers", "Aine", "Dos"]
+    prenoms = ["Lucas", "Antoine", "Thomas", "Alexandre", "Nicolas", "Pierre", "Julien", "Maxime", "Hugo", "Louis"]
+    noms = ["Martin", "Bernard", "Dubois", "Moreau", "Simon", "Laurent", "Leroy", "Petit", "Garcia", "Roux"]
     
     return [
         {
@@ -92,31 +75,16 @@ def generer_blessures_demo():
         for i in range(nb_blessures)
     ]
 
-def obtenir_statistiques_avancees(team_id, rapid_league_id, saison="2024"):
-    """Récupère xG et discipline via API-Football ou génère des données de démo"""
-    if RAPID_API_KEY == "VOTRE_CLE_RAPIDAPI_ICI":
-        return generer_stats_demo()
-    
-    try:
-        url = "https://api-football-v1.p.rapidapi.com/v3/teams/statistics"
-        params = {"team": team_id, "league": rapid_league_id, "season": saison}
-        r = requests.get(url, headers=RAPID_HEADERS, params=params, timeout=10)
-        r.raise_for_status()
-        data = r.json()
-        stats = data.get("response", {})
-        
-        return {
-            "xg_for": stats.get("goals", {}).get("for", {}).get("average", {}).get("total", "N/A"),
-            "xg_against": stats.get("goals", {}).get("against", {}).get("average", {}).get("total", "N/A"),
-            "yellow_cards": stats.get("cards", {}).get("yellow", {}).get("0-15", {}).get("total", 0),
-            "red_cards": stats.get("cards", {}).get("red", {}).get("0-15", {}).get("total", 0)
-        }
-    except Exception as e:
-        print(f"[STATS AVANCÉES] Erreur: {e}")
-        return generer_stats_demo()
+def obtenir_statistiques_avancees(team_name, rapid_league_id, saison="2024"):
+    """
+    Récupère xG et discipline via des données de démonstration
+    Note: Pour des vraies données, il faudrait une API payante
+    """
+    print(f"[STATS AVANCÉES] Mode démo pour {team_name}")
+    return generer_stats_demo()
 
 def generer_stats_demo():
-    """Génère des statistiques de démonstration"""
+    """Génère des statistiques avancées de démonstration"""
     return {
         "xg_for": round(random.uniform(1.2, 2.5), 2),
         "xg_against": round(random.uniform(0.8, 2.0), 2),
@@ -124,29 +92,86 @@ def generer_stats_demo():
         "red_cards": random.randint(0, 5)
     }
 
-def calculer_importance_match(home_pos, away_pos, home_points, away_points):
-    """Calcule l'importance du match"""
+def calculer_importance_match(home_pos, away_pos, home_points, away_points, competition_stage=None):
+    """
+    Calcule l'importance du match
+    Gère les compétitions à élimination directe (Ligue des Champions)
+    """
     importance = "Moyenne"
     score_importance = 5
     
-    if home_pos <= 4 and away_pos <= 4:
-        importance = "Très élevée - Lutte pour le titre/Europe"
-        score_importance = 10
-    elif home_pos >= 16 and away_pos >= 16:
-        importance = "Élevée - Match de maintien"
-        score_importance = 8
-    elif abs(home_points - away_points) <= 3:
-        importance = "Élevée - Match serré au classement"
-        score_importance = 7
-    elif (home_pos <= 4 and away_pos >= 16) or (away_pos <= 4 and home_pos >= 16):
-        importance = "Moyenne - Écart de niveau"
-        score_importance = 4
+    # Pour les matchs à élimination directe (pas de classement)
+    if competition_stage and competition_stage in ["FINAL", "SEMI_FINALS", "QUARTER_FINALS", "ROUND_OF_16", "LAST_16"]:
+        stage_importance = {
+            "FINAL": ("FINALE - Enjeu maximum", 15),
+            "SEMI_FINALS": ("DEMI-FINALE - Enjeu très élevé", 12),
+            "QUARTER_FINALS": ("QUART DE FINALE - Enjeu élevé", 10),
+            "ROUND_OF_16": ("HUITIÈME DE FINALE - Enjeu élevé", 10),
+            "LAST_16": ("HUITIÈME DE FINALE - Enjeu élevé", 10)
+        }
+        return stage_importance.get(competition_stage, ("Match à élimination directe", 8))
+    
+    # Pour les compétitions avec classement
+    if home_pos and away_pos and home_points is not None and away_points is not None:
+        if home_pos <= 4 and away_pos <= 4:
+            importance = "Très élevée - Lutte pour le titre/Europe"
+            score_importance = 10
+        elif home_pos >= 16 and away_pos >= 16:
+            importance = "Élevée - Match de maintien"
+            score_importance = 8
+        elif abs(home_points - away_points) <= 3:
+            importance = "Élevée - Match serré au classement"
+            score_importance = 7
+        elif (home_pos <= 4 and away_pos >= 16) or (away_pos <= 4 and home_pos >= 16):
+            importance = "Moyenne - Écart de niveau"
+            score_importance = 4
     
     return importance, score_importance
 
+def normaliser_nom_equipe(nom):
+    """Normalise le nom d'une équipe pour faciliter la correspondance"""
+    # Supprime les accents, met en minuscule, retire les mots communs
+    import unicodedata
+    nom = unicodedata.normalize('NFD', nom).encode('ascii', 'ignore').decode('utf-8')
+    nom = nom.lower()
+    # Retire les mots communs
+    mots_a_retirer = ['fc', 'cf', 'ac', 'afc', 'bfc', 'rc', 'as', 'sporting', 'club', 'united', 'city']
+    mots = nom.split()
+    mots_filtres = [m for m in mots if m not in mots_a_retirer]
+    return ' '.join(mots_filtres) if mots_filtres else nom
+
+def trouver_match_odds(home_team, away_team, odds_data):
+    """
+    Trouve le match correspondant dans les données de côtes
+    Utilise une correspondance flexible pour gérer les différences de noms
+    """
+    home_normalized = normaliser_nom_equipe(home_team)
+    away_normalized = normaliser_nom_equipe(away_team)
+    
+    for match in odds_data:
+        match_home = normaliser_nom_equipe(match.get("home_team", ""))
+        match_away = normaliser_nom_equipe(match.get("away_team", ""))
+        
+        # Correspondance exacte
+        if match_home == home_normalized and match_away == away_normalized:
+            return match
+        
+        # Correspondance partielle (un des mots clés correspond)
+        home_mots = set(home_normalized.split())
+        away_mots = set(away_normalized.split())
+        match_home_mots = set(match_home.split())
+        match_away_mots = set(match_away.split())
+        
+        if (home_mots & match_home_mots) and (away_mots & match_away_mots):
+            return match
+    
+    return None
+
 def obtenir_cotes(home_team, away_team, odds_sport):
-    """Récupère les meilleures côtes des bookmakers ou génère des données de démo"""
+    """Récupère les meilleures côtes des bookmakers"""
+    # Mode démo si pas de clé API
     if ODDS_API_KEY == "VOTRE_CLE_ODDS_API_ICI":
+        print(f"[CÔTES] Mode démo pour {home_team} vs {away_team}")
         return generer_cotes_demo()
     
     try:
@@ -157,49 +182,71 @@ def obtenir_cotes(home_team, away_team, odds_sport):
             "markets": "h2h",
             "oddsFormat": "decimal"
         }
+        
+        print(f"[CÔTES] Requête API pour {odds_sport}")
         r = requests.get(url, params=params, timeout=10)
+        
+        # Vérifier le nombre de requêtes restantes
+        remaining = r.headers.get('x-requests-remaining', 'N/A')
+        print(f"[CÔTES] Requêtes restantes: {remaining}")
+        
         r.raise_for_status()
         data = r.json()
         
-        for match in data:
-            if (home_team.lower() in match["home_team"].lower() or 
-                away_team.lower() in match["away_team"].lower()):
-                
-                best_odds = {"home": 0, "draw": 0, "away": 0}
-                bookmakers = {"home": "", "draw": "", "away": ""}
-                
-                for bookmaker in match.get("bookmakers", []):
-                    for market in bookmaker.get("markets", []):
-                        if market["key"] == "h2h":
-                            for outcome in market["outcomes"]:
-                                if outcome["name"] == match["home_team"]:
-                                    if outcome["price"] > best_odds["home"]:
-                                        best_odds["home"] = outcome["price"]
-                                        bookmakers["home"] = bookmaker["title"]
-                                elif outcome["name"] == match["away_team"]:
-                                    if outcome["price"] > best_odds["away"]:
-                                        best_odds["away"] = outcome["price"]
-                                        bookmakers["away"] = bookmaker["title"]
-                                elif outcome["name"] == "Draw":
-                                    if outcome["price"] > best_odds["draw"]:
-                                        best_odds["draw"] = outcome["price"]
-                                        bookmakers["draw"] = bookmaker["title"]
-                
+        # Chercher le match correspondant avec correspondance flexible
+        match = trouver_match_odds(home_team, away_team, data)
+        
+        if match:
+            print(f"[CÔTES] Match trouvé: {match['home_team']} vs {match['away_team']}")
+            
+            best_odds = {"home": 0, "draw": 0, "away": 0}
+            bookmakers = {"home": "", "draw": "", "away": ""}
+            
+            for bookmaker in match.get("bookmakers", []):
+                for market in bookmaker.get("markets", []):
+                    if market["key"] == "h2h":
+                        for outcome in market["outcomes"]:
+                            if outcome["name"] == match["home_team"]:
+                                if outcome["price"] > best_odds["home"]:
+                                    best_odds["home"] = outcome["price"]
+                                    bookmakers["home"] = bookmaker["title"]
+                            elif outcome["name"] == match["away_team"]:
+                                if outcome["price"] > best_odds["away"]:
+                                    best_odds["away"] = outcome["price"]
+                                    bookmakers["away"] = bookmaker["title"]
+                            elif outcome["name"] == "Draw":
+                                if outcome["price"] > best_odds["draw"]:
+                                    best_odds["draw"] = outcome["price"]
+                                    bookmakers["draw"] = bookmaker["title"]
+            
+            if best_odds["home"] > 0:  # Si on a trouvé des côtes
                 return best_odds, bookmakers
+        
+        print(f"[CÔTES] Aucun match trouvé dans les données API")
         
     except Exception as e:
         print(f"[CÔTES] Erreur: {e}")
     
+    # Fallback vers mode démo
     return generer_cotes_demo()
 
 def generer_cotes_demo():
-    """Génère des côtes de démonstration"""
+    """Génère des côtes de démonstration réalistes"""
     bookmakers_list = ["Betclic", "Unibet", "Winamax", "Parions Sport"]
     
+    # Génère des côtes cohérentes (la somme des probabilités implicites ~ 100%)
+    # Probabilités réalistes
+    prob_home = random.uniform(0.25, 0.55)
+    prob_draw = random.uniform(0.20, 0.30)
+    prob_away = 1 - prob_home - prob_draw
+    
+    # Conversion en côtes avec marge bookmaker (~5-10%)
+    marge = random.uniform(1.05, 1.10)
+    
     best_odds = {
-        "home": round(random.uniform(1.5, 3.5), 2),
-        "draw": round(random.uniform(3.0, 4.0), 2),
-        "away": round(random.uniform(1.8, 4.5), 2)
+        "home": round(marge / prob_home, 2),
+        "draw": round(marge / prob_draw, 2),
+        "away": round(marge / prob_away, 2)
     }
     
     bookmakers = {
@@ -209,6 +256,59 @@ def generer_cotes_demo():
     }
     
     return best_odds, bookmakers
+
+def calculer_buts_probables(home_forme, away_forme, home_stats, away_stats, home_advanced, away_advanced):
+    """
+    Calcule une estimation plus précise du nombre de buts
+    Prend en compte: forme récente, stats défensives, xG, domicile/extérieur
+    """
+    # Buts moyens sur la forme récente (5 derniers matchs)
+    home_buts_forme = home_forme["buts_marques"] / max(home_forme["nb_matchs"], 1)
+    away_buts_forme = away_forme["buts_marques"] / max(away_forme["nb_matchs"], 1)
+    
+    # Buts encaissés moyens (défense)
+    home_def = home_forme["buts_encaisses"] / max(home_forme["nb_matchs"], 1)
+    away_def = away_forme["buts_encaisses"] / max(away_forme["nb_matchs"], 1)
+    
+    # xG si disponible (plus fiable que les buts réels)
+    try:
+        home_xg = float(home_advanced['xg_for']) if home_advanced['xg_for'] != 'N/A' else home_buts_forme
+        away_xg = float(away_advanced['xg_for']) if away_advanced['xg_for'] != 'N/A' else away_buts_forme
+    except:
+        home_xg = home_buts_forme
+        away_xg = away_buts_forme
+    
+    # Calcul hybride: 
+    # - L'attaque de l'équipe domicile contre la défense de l'extérieur
+    # - L'attaque de l'équipe extérieure contre la défense du domicile
+    # - Bonus domicile (+0.2 buts)
+    
+    # Pondération: 40% forme récente, 40% xG, 20% stats générales
+    home_attaque = (0.4 * home_buts_forme) + (0.4 * home_xg) + (0.2 * home_stats.get("goalsFor", 0) / 18)
+    away_attaque = (0.4 * away_buts_forme) + (0.4 * away_xg) + (0.2 * away_stats.get("goalsFor", 0) / 18)
+    
+    # Buts attendus pour le match
+    buts_home = (home_attaque + away_def) / 2 + 0.2  # Bonus domicile
+    buts_away = (away_attaque + home_def) / 2 - 0.1  # Malus extérieur
+    
+    # Ajustements selon la forme
+    if home_forme["forme_str"].count("V") >= 3:
+        buts_home *= 1.1
+    if away_forme["forme_str"].count("V") >= 3:
+        buts_away *= 1.1
+    
+    if home_forme["forme_str"].count("D") >= 3:
+        buts_home *= 0.9
+    if away_forme["forme_str"].count("D") >= 3:
+        buts_away *= 0.9
+    
+    total = buts_home + buts_away
+    
+    return {
+        "home": round(max(0.5, buts_home), 1),
+        "away": round(max(0.5, buts_away), 1),
+        "total": round(max(1.0, total), 1)
+    }
 
 @app.route("/api/leagues")
 def get_leagues():
@@ -270,8 +370,15 @@ def predict_match(match_id, league_code):
         away_team = match["awayTeam"]["name"]
         home_id = match["homeTeam"]["id"]
         away_id = match["awayTeam"]["id"]
+        
+        # Récupérer la phase de la compétition (pour Ligue des Champions)
+        competition_stage = match.get("stage", None)
+        print(f"[MATCH] Stage: {competition_stage}")
 
         classement = {}; crests = {}
+        home_stats = {}; away_stats = {}
+        
+        # Tentative de récupération du classement (peut échouer pour matchs éliminatoires)
         standings_data = api_get(f"/competitions/{league_code}/standings")
         if standings_data:
             standings_raw = standings_data.get("standings", [])
@@ -284,28 +391,29 @@ def predict_match(match_id, league_code):
                         "goalDifference": t["goalDifference"]
                     }
                     crests[t["team"]["name"]] = t["team"].get("crest", "")
-
+        
         home_stats = classement.get(home_team, {})
         away_stats = classement.get(away_team, {})
 
-        # Récupération des blessures
-        home_injuries = obtenir_blessures(home_id, rapid_league_id)
-        away_injuries = obtenir_blessures(away_id, rapid_league_id)
+        # Récupération des blessures (mode démo)
+        home_injuries = obtenir_blessures(home_team, rapid_league_id)
+        away_injuries = obtenir_blessures(away_team, rapid_league_id)
         
-        # Récupération des stats avancées (xG, discipline)
-        home_advanced = obtenir_statistiques_avancees(home_id, rapid_league_id)
-        away_advanced = obtenir_statistiques_avancees(away_id, rapid_league_id)
+        # Récupération des stats avancées (mode démo)
+        home_advanced = obtenir_statistiques_avancees(home_team, rapid_league_id)
+        away_advanced = obtenir_statistiques_avancees(away_team, rapid_league_id)
         
-        # Calcul de l'importance du match
-        home_pos = home_stats.get("position", 10)
-        away_pos = away_stats.get("position", 10)
-        home_points = home_stats.get("points", 0)
-        away_points = away_stats.get("points", 0)
+        # Calcul de l'importance du match (adapté pour les éliminations directes)
+        home_pos = home_stats.get("position", None)
+        away_pos = away_stats.get("position", None)
+        home_points = home_stats.get("points", None)
+        away_points = away_stats.get("points", None)
+        
         importance, score_importance = calculer_importance_match(
-            home_pos, away_pos, home_points, away_points
+            home_pos, away_pos, home_points, away_points, competition_stage
         )
         
-        # Récupération des côtes
+        # Récupération des côtes (avec correspondance améliorée)
         best_odds, bookmakers = obtenir_cotes(home_team, away_team, odds_sport)
 
         hm_data = api_get(f"/teams/{home_id}/matches", {"status": "FINISHED", "limit": 5})
@@ -372,11 +480,13 @@ def predict_match(match_id, league_code):
         # Bonus domicile
         score_home += 10
         
-        # Classement et points
-        hp = home_stats.get("points", 0); ap = away_stats.get("points", 0)
-        score_home += hp * 0.5; score_away += ap * 0.5
-        hpos = home_stats.get("position", 10); apos = away_stats.get("position", 10)
-        score_home += (21 - hpos) * 2; score_away += (21 - apos) * 2
+        # Classement et points (si disponibles)
+        if home_points is not None and away_points is not None:
+            hp = home_points; ap = away_points
+            score_home += hp * 0.5; score_away += ap * 0.5
+            if home_pos and away_pos:
+                hpos = home_pos; apos = away_pos
+                score_home += (21 - hpos) * 2; score_away += (21 - apos) * 2
         
         # Différence de buts
         hdiff = home_stats.get("goalDifference", 0); adiff = away_stats.get("goalDifference", 0)
@@ -389,7 +499,7 @@ def predict_match(match_id, league_code):
         if home_forme["forme_str"].count("D") >= 3: score_home -= 5
         if away_forme["forme_str"].count("D") >= 3: score_away -= 5
         
-        # xG (Expected Goals) - NOUVEAU
+        # xG (Expected Goals)
         try:
             home_xg = float(home_advanced['xg_for']) if home_advanced['xg_for'] != 'N/A' else 1.5
             away_xg = float(away_advanced['xg_for']) if away_advanced['xg_for'] != 'N/A' else 1.5
@@ -398,11 +508,11 @@ def predict_match(match_id, league_code):
         except:
             pass
         
-        # Blessures - NOUVEAU (impact négatif)
+        # Blessures (impact négatif)
         score_home -= len(home_injuries) * 2
         score_away -= len(away_injuries) * 2
         
-        # Discipline - NOUVEAU (pénalité pour équipes indisciplinées)
+        # Discipline (pénalité pour équipes indisciplinées)
         try:
             home_cards = int(home_advanced['yellow_cards']) + int(home_advanced['red_cards']) * 3
             away_cards = int(away_advanced['yellow_cards']) + int(away_advanced['red_cards']) * 3
@@ -411,7 +521,7 @@ def predict_match(match_id, league_code):
         except:
             pass
         
-        # Importance du match - NOUVEAU
+        # Importance du match
         if score_home > score_away:
             score_home += score_importance / 10
         else:
@@ -419,13 +529,16 @@ def predict_match(match_id, league_code):
         
         # Calcul match nul
         score_draw += (home_forme["forme_str"].count("N") + away_forme["forme_str"].count("N")) * 3
-        diff_pos = abs(hpos - apos); diff_pts = abs(hp - ap)
-        if diff_pos <= 3: score_draw += 10
-        elif diff_pos <= 6: score_draw += 5
-        if diff_pts <= 5: score_draw += 8
-        elif diff_pts <= 10: score_draw += 4
-        if abs(home_forme["points"] - away_forme["points"]) <= 3: score_draw += 6
-        if (hpos + apos) / 2 <= 5: score_draw += 5
+        
+        if home_pos and away_pos and home_points is not None and away_points is not None:
+            diff_pos = abs(home_pos - away_pos)
+            diff_pts = abs(home_points - away_points)
+            if diff_pos <= 3: score_draw += 10
+            elif diff_pos <= 6: score_draw += 5
+            if diff_pts <= 5: score_draw += 8
+            elif diff_pts <= 10: score_draw += 4
+            if abs(home_forme["points"] - away_forme["points"]) <= 3: score_draw += 6
+            if (home_pos + away_pos) / 2 <= 5: score_draw += 5
 
         total = score_home + score_away + score_draw
         prob_home = round(score_home / total * 100, 1)
@@ -452,9 +565,10 @@ def predict_match(match_id, league_code):
         probs_sorted = sorted([prob_home, prob_draw, prob_away], reverse=True)
         tight = probs_sorted[0] - probs_sorted[1] < 10
 
-        avg_gh = home_forme["buts_marques"] / max(home_forme["nb_matchs"], 1)
-        avg_ga = away_forme["buts_marques"] / max(away_forme["nb_matchs"], 1)
-        avg_total = avg_gh + avg_ga
+        # NOUVEAU - Calcul amélioré du nombre de buts
+        avg_goals = calculer_buts_probables(
+            home_forme, away_forme, home_stats, away_stats, home_advanced, away_advanced
+        )
 
         return jsonify({
             "home_team": home_team,
@@ -485,9 +599,9 @@ def predict_match(match_id, league_code):
             "recommendation": rec,
             "confidence": conf,
             "tight_match": tight,
-            "over_2_5": avg_total > 2.5,
-            "btts": avg_gh >= 1 and avg_ga >= 1,
-            "avg_goals": {"home": round(avg_gh, 1), "away": round(avg_ga, 1), "total": round(avg_total, 1)}
+            "over_2_5": avg_goals["total"] > 2.5,
+            "btts": avg_goals["home"] >= 1 and avg_goals["away"] >= 1,
+            "avg_goals": avg_goals
         })
 
     except Exception as e:
