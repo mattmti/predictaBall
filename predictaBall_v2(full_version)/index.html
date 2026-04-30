@@ -650,34 +650,6 @@
       font-weight: 700;
     }
 
-    .injuries-section {
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-    }
-
-    .injury-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 0;
-      font-size: 0.85rem;
-    }
-
-    .injury-icon { font-size: 1rem; }
-    .injury-player { flex: 1; color: var(--text); }
-
-    .injury-type {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--red);
-      background: rgba(255,62,91,0.1);
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
-
-    .no-injuries { color: var(--green); font-size: 0.85rem; padding: 8px 0; }
-
     .advanced-stats {
       margin-top: 16px;
       padding-top: 16px;
@@ -1102,17 +1074,6 @@
                   <div class="stat-row"><span class="stat-key">🟥 Cartons rouges</span><span class="stat-val">{{ analysis.home_advanced.red_cards }}</span></div>
                 </div>
               </div>
-              <div class="injuries-section" v-if="analysis.home_injuries">
-                <div class="stat-card-title" style="margin-bottom:8px">🏥 BLESSURES</div>
-                <div v-if="analysis.home_injuries.length === 0" class="no-injuries">✅ Aucune blessure majeure</div>
-                <div v-else>
-                  <div v-for="injury in analysis.home_injuries" :key="injury.player" class="injury-item">
-                    <span class="injury-icon">❌</span>
-                    <span class="injury-player">{{ injury.player }}</span>
-                    <span class="injury-type">{{ injury.type }}</span>
-                  </div>
-                </div>
-              </div>
               <div style="margin-top: 16px;">
                 <div class="stat-card-title" style="margin-bottom:8px">FORME RÉCENTE</div>
                 <div class="form-dots">
@@ -1139,17 +1100,6 @@
                   <div class="stat-row"><span class="stat-key">xG moyen (contre)</span><span class="stat-val">{{ analysis.away_advanced.xg_against }}</span></div>
                   <div class="stat-row"><span class="stat-key">🟨 Cartons jaunes</span><span class="stat-val">{{ analysis.away_advanced.yellow_cards }}</span></div>
                   <div class="stat-row"><span class="stat-key">🟥 Cartons rouges</span><span class="stat-val">{{ analysis.away_advanced.red_cards }}</span></div>
-                </div>
-              </div>
-              <div class="injuries-section" v-if="analysis.away_injuries">
-                <div class="stat-card-title" style="margin-bottom:8px">🏥 BLESSURES</div>
-                <div v-if="analysis.away_injuries.length === 0" class="no-injuries">✅ Aucune blessure majeure</div>
-                <div v-else>
-                  <div v-for="injury in analysis.away_injuries" :key="injury.player" class="injury-item">
-                    <span class="injury-icon">❌</span>
-                    <span class="injury-player">{{ injury.player }}</span>
-                    <span class="injury-type">{{ injury.type }}</span>
-                  </div>
                 </div>
               </div>
               <div style="margin-top: 16px;">

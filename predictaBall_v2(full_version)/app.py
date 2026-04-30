@@ -63,24 +63,6 @@ def api_get(path, params=None):
         print(f"[ERROR] {path} - {e}")
         return None
 
-def obtenir_blessures(team_name, rapid_league_id, saison="2024"):
-    print(f"[BLESSURES] Mode démo pour {team_name}")
-    return generer_blessures_demo()
-
-def generer_blessures_demo():
-    nb_blessures = random.randint(0, 3)
-    types_blessures = ["Blessure musculaire", "Cheville", "Genou", "Ischio-jambiers", "Aine", "Dos"]
-    prenoms = ["Lucas", "Antoine", "Thomas", "Alexandre", "Nicolas", "Pierre", "Julien", "Maxime", "Hugo", "Louis"]
-    noms = ["Martin", "Bernard", "Dubois", "Moreau", "Simon", "Laurent", "Leroy", "Petit", "Garcia", "Roux"]
-    return [
-        {
-            "player": f"{random.choice(prenoms)} {random.choice(noms)}",
-            "type": random.choice(types_blessures),
-            "reason": "Blessure"
-        }
-        for i in range(nb_blessures)
-    ]
-
 def obtenir_statistiques_avancees(team_name, rapid_league_id, saison="2024"):
     print(f"[STATS AVANCÉES] Mode démo pour {team_name}")
     return generer_stats_demo()
@@ -234,7 +216,11 @@ def get_matches(league_code):
         data = api_get(f"/competitions/{league_code}/matches", {"status": "SCHEDULED"})
         if data is None:
             return jsonify({"error": "Impossible de recuperer les matchs"}), 502
-        return jsonify(data.get("matches", [])[:5])
+        matches = [
+            m for m in data.get("matches", [])
+            if m.get("homeTeam", {}).get("name") and m.get("awayTeam", {}).get("name")
+        ]
+        return jsonify(matches[:5])
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -270,7 +256,6 @@ def predict_match(match_id, league_code):
                 break
         if not league_info:
             return jsonify({"error": "Championnat non trouvé"}), 404
-        rapid_league_id = league_info["rapid_id"]
         odds_sport = league_info["odds_sport"]
         data = api_get(f"/matches/{match_id}")
         if data is None:
@@ -297,10 +282,8 @@ def predict_match(match_id, league_code):
                     crests[t["team"]["name"]] = t["team"].get("crest", "")
         home_stats = classement.get(home_team, {})
         away_stats = classement.get(away_team, {})
-        home_injuries = obtenir_blessures(home_team, rapid_league_id)
-        away_injuries = obtenir_blessures(away_team, rapid_league_id)
-        home_advanced = obtenir_statistiques_avancees(home_team, rapid_league_id)
-        away_advanced = obtenir_statistiques_avancees(away_team, rapid_league_id)
+        home_advanced = obtenir_statistiques_avancees(home_team, league_info["rapid_id"])
+        away_advanced = obtenir_statistiques_avancees(away_team, league_info["rapid_id"])
         home_pos = home_stats.get("position", None)
         away_pos = away_stats.get("position", None)
         home_points = home_stats.get("points", None)
@@ -386,8 +369,6 @@ def predict_match(match_id, league_code):
             score_away += away_xg * 3
         except:
             pass
-        score_home -= len(home_injuries) * 2
-        score_away -= len(away_injuries) * 2
         try:
             home_cards = int(home_advanced['yellow_cards']) + int(home_advanced['red_cards']) * 3
             away_cards = int(away_advanced['yellow_cards']) + int(away_advanced['red_cards']) * 3
@@ -444,8 +425,6 @@ def predict_match(match_id, league_code):
             "away_stats": away_stats,
             "home_forme": home_forme,
             "away_forme": away_forme,
-            "home_injuries": home_injuries,
-            "away_injuries": away_injuries,
             "home_advanced": home_advanced,
             "away_advanced": away_advanced,
             "match_importance": importance,
@@ -839,28 +818,6 @@ def generate_pdf_report(data: dict) -> bytes:
         story.append(adv_table)
         story.append(Spacer(1, 5 * mm))
 
-    # ── BLESSURES ────────────────────────────────────────────────────────────
-    hi = data.get('home_injuries', [])
-    ai = data.get('away_injuries', [])
-    story.append(Paragraph("BLESSURES CONNUES", s['section_header']))
-    inj_rows = [['EQUIPE', 'JOUEUR', 'TYPE']]
-    for inj in hi:
-        inj_rows.append([home, inj.get('player', '-'), inj.get('type', '-')])
-    for inj in ai:
-        inj_rows.append([away, inj.get('player', '-'), inj.get('type', '-')])
-    if len(inj_rows) == 1:
-        inj_rows.append(['—', 'Aucune blessure majeure connue', '—'])
-    inj_table = Table(inj_rows, colWidths=[col2, col1, col2])
-    inj_extra = []
-    for i, row in enumerate(inj_rows[1:], 1):
-        if row[0] == home:
-            inj_extra.append(('TEXTCOLOR', (0, i), (0, i), C_GREEN))
-        elif row[0] == away:
-            inj_extra.append(('TEXTCOLOR', (0, i), (0, i), C_BLUE))
-    inj_table.setStyle(table_style_dark(inj_extra))
-    story.append(inj_table)
-    story.append(Spacer(1, 5 * mm))
-
     # ── H2H ──────────────────────────────────────────────────────────────────
     h2h = data.get('h2h')
     if h2h:
@@ -922,7 +879,7 @@ def generate_pdf_report(data: dict) -> bytes:
     story.append(Paragraph(
         "Ce rapport est généré automatiquement par PredictaBall à des fins d'analyse uniquement. "
         "Les probabilités sont basées sur des données statistiques et ne constituent pas des conseils de paris. "
-        "Les données de blessures et xG sont en mode démonstration.",
+        "Les données xG sont en mode démonstration.",
         s['footer']
     ))
     story.append(Paragraph("PredictaBall — by Matteo Monti", s['footer']))
