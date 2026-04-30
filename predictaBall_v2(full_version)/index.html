@@ -270,6 +270,58 @@
       box-shadow: 0 0 16px rgba(0,255,135,0.2);
     }
 
+    /* ── NOUVEAU : Bouton PDF ── */
+    .pdf-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, rgba(255,62,91,0.15), rgba(255,62,91,0.08));
+      border: 1px solid rgba(255,62,91,0.5);
+      color: var(--red);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .pdf-btn:hover {
+      background: linear-gradient(135deg, rgba(255,62,91,0.25), rgba(255,62,91,0.15));
+      box-shadow: 0 0 20px rgba(255,62,91,0.2);
+      border-color: var(--red);
+      transform: translateY(-1px);
+    }
+
+    .pdf-btn:disabled, .pdf-btn.loading {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .pdf-btn-icon { font-size: 1rem; }
+
+    .pdf-btn-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,62,91,0.3);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    .action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
     .analysis-panel {
       animation: fadeInUp 0.4s ease;
     }
@@ -278,6 +330,8 @@
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .prediction-hero {
       background: var(--card);
@@ -297,7 +351,6 @@
       background: linear-gradient(90deg, transparent, var(--green), transparent);
     }
 
-    /* NOUVEAU - Badge importance */
     .importance-badge {
       text-align: center;
       margin-bottom: 24px;
@@ -458,7 +511,6 @@
       color: var(--green);
     }
 
-    /* NOUVEAU - Affichage de la côte */
     .odds-display {
       margin-top: 12px;
       font-family: var(--font-mono);
@@ -506,7 +558,6 @@
       display: inline-block;
     }
 
-    /* NOUVEAU - Section côtes bookmakers */
     .odds-section {
       background: var(--card);
       border: 1px solid var(--border);
@@ -599,7 +650,6 @@
       font-weight: 700;
     }
 
-    /* NOUVEAU - Section blessures */
     .injuries-section {
       margin-top: 16px;
       padding-top: 16px;
@@ -614,14 +664,8 @@
       font-size: 0.85rem;
     }
 
-    .injury-icon {
-      font-size: 1rem;
-    }
-
-    .injury-player {
-      flex: 1;
-      color: var(--text);
-    }
+    .injury-icon { font-size: 1rem; }
+    .injury-player { flex: 1; color: var(--text); }
 
     .injury-type {
       font-family: var(--font-mono);
@@ -632,13 +676,8 @@
       border-radius: 4px;
     }
 
-    .no-injuries {
-      color: var(--green);
-      font-size: 0.85rem;
-      padding: 8px 0;
-    }
+    .no-injuries { color: var(--green); font-size: 0.85rem; padding: 8px 0; }
 
-    /* NOUVEAU - Stats avancées (xG, discipline) */
     .advanced-stats {
       margin-top: 16px;
       padding-top: 16px;
@@ -680,10 +719,7 @@
       gap: 14px;
     }
 
-    .insight-icon {
-      font-size: 1.5rem;
-      flex-shrink: 0;
-    }
+    .insight-icon { font-size: 1.5rem; flex-shrink: 0; }
 
     .insight-label {
       font-family: var(--font-mono);
@@ -719,16 +755,10 @@
       margin: 16px 0;
     }
 
-    .h2h-score {
-      font-family: var(--font-title);
-      font-size: 3rem;
-      letter-spacing: 0.05em;
-    }
-
+    .h2h-score { font-family: var(--font-title); font-size: 3rem; letter-spacing: 0.05em; }
     .h2h-score.home { color: var(--green); }
     .h2h-score.away { color: var(--blue); }
     .h2h-score.draw { color: var(--yellow); font-size: 2rem; }
-
     .h2h-sep { color: var(--muted); font-family: var(--font-mono); font-size: 1.2rem; }
 
     .h2h-match-row {
@@ -764,21 +794,9 @@
 
     .scorer-item:last-child { border-bottom: none; }
 
-    .scorer-rank {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--muted);
-      width: 16px;
-    }
-
+    .scorer-rank { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); width: 16px; }
     .scorer-name { font-size: 0.9rem; font-weight: 500; flex: 1; }
-
-    .scorer-goals {
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      color: var(--green);
-      font-weight: 700;
-    }
+    .scorer-goals { font-family: var(--font-mono); font-size: 0.85rem; color: var(--green); font-weight: 700; }
 
     .loader {
       display: flex;
@@ -798,8 +816,6 @@
       animation: spin 0.8s linear infinite;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
-
     .loader-text {
       font-family: var(--font-mono);
       font-size: 0.75rem;
@@ -807,12 +823,7 @@
       letter-spacing: 0.15em;
     }
 
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
-    }
-
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
     .empty-icon { font-size: 3rem; margin-bottom: 16px; }
     .empty-text { font-family: var(--font-title); font-size: 1.4rem; letter-spacing: 0.05em; }
 
@@ -824,6 +835,7 @@
       .team-name-hero { font-size: 1.2rem; }
       .league-grid { grid-template-columns: repeat(2, 1fr); }
       header { padding: 0 16px; }
+      .action-bar { flex-direction: column; align-items: flex-start; }
     }
 
     .divider {
@@ -843,7 +855,6 @@
       cursor: pointer;
       letter-spacing: 0.1em;
       transition: all 0.2s;
-      margin-bottom: 24px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -927,7 +938,22 @@
 
       <!-- STEP 3: ANALYSIS RESULT -->
       <template v-if="step === 'analysis'">
-        <button class="back-btn" @click="goBackToMatches">← MATCHS</button>
+
+        <!-- Barre d'actions : retour + bouton PDF -->
+        <div class="action-bar">
+          <button class="back-btn" @click="goBackToMatches">← MATCHS</button>
+          <button
+            v-if="analysis && !loadingAnalysis"
+            class="pdf-btn"
+            :class="{ loading: generatingPdf }"
+            :disabled="generatingPdf"
+            @click="downloadPdf"
+          >
+            <span v-if="generatingPdf" class="pdf-btn-spinner"></span>
+            <span v-else class="pdf-btn-icon">📄</span>
+            {{ generatingPdf ? 'GÉNÉRATION EN COURS...' : 'TÉLÉCHARGER LE RAPPORT PDF' }}
+          </button>
+        </div>
 
         <div v-if="loadingAnalysis" class="loader">
           <div class="loader-ring"></div>
@@ -940,7 +966,6 @@
 
           <!-- HERO -->
           <div class="prediction-hero">
-            <!-- NOUVEAU - Importance du match -->
             <div class="importance-badge" v-if="analysis.match_importance">
               <div class="importance-label">IMPORTANCE DU MATCH</div>
               <div class="importance-value">⚡ {{ analysis.match_importance }}</div>
@@ -987,9 +1012,8 @@
               <div>
                 <div style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); letter-spacing: 0.15em; margin-bottom: 4px;">PRONOSTIC RECOMMANDÉ</div>
                 <div class="rec-main">✓ {{ analysis.recommendation }}</div>
-                <!-- NOUVEAU - Affichage de la meilleure côte -->
                 <div class="odds-display" v-if="analysis.recommended_odd">
-                  💰 Meilleure côte : 
+                  💰 Meilleure côte :
                   <span class="odds-value">{{ analysis.recommended_odd }}</span>
                   <span class="bookmaker-name">{{ analysis.recommended_bookmaker }}</span>
                 </div>
@@ -999,7 +1023,7 @@
             </div>
           </div>
 
-          <!-- NOUVEAU - Section côtes complètes -->
+          <!-- CÔTES COMPLÈTES -->
           <div class="odds-section" v-if="analysis.best_odds">
             <div class="stat-card-title">💰 MEILLEURES CÔTES DES BOOKMAKERS</div>
             <div class="odds-grid">
@@ -1069,8 +1093,6 @@
                 <div class="stat-row"><span class="stat-key">Diff. buts</span><span class="stat-val">{{ formatDiff(analysis.home_stats.goalDifference) }}</span></div>
                 <div class="stat-row"><span class="stat-key">V / N / D</span><span class="stat-val">{{ analysis.home_stats.wins }}V {{ analysis.home_stats.draws }}N {{ analysis.home_stats.losses }}D</span></div>
               </div>
-              
-              <!-- NOUVEAU - Stats avancées (xG, discipline) -->
               <div class="advanced-stats" v-if="analysis.home_advanced">
                 <div class="stat-card-title" style="margin-bottom:8px">📈 STATS AVANCÉES</div>
                 <div class="stat-rows">
@@ -1080,13 +1102,9 @@
                   <div class="stat-row"><span class="stat-key">🟥 Cartons rouges</span><span class="stat-val">{{ analysis.home_advanced.red_cards }}</span></div>
                 </div>
               </div>
-
-              <!-- NOUVEAU - Blessures -->
               <div class="injuries-section" v-if="analysis.home_injuries">
                 <div class="stat-card-title" style="margin-bottom:8px">🏥 BLESSURES</div>
-                <div v-if="analysis.home_injuries.length === 0" class="no-injuries">
-                  ✅ Aucune blessure majeure
-                </div>
+                <div v-if="analysis.home_injuries.length === 0" class="no-injuries">✅ Aucune blessure majeure</div>
                 <div v-else>
                   <div v-for="injury in analysis.home_injuries" :key="injury.player" class="injury-item">
                     <span class="injury-icon">❌</span>
@@ -1095,7 +1113,6 @@
                   </div>
                 </div>
               </div>
-
               <div style="margin-top: 16px;">
                 <div class="stat-card-title" style="margin-bottom:8px">FORME RÉCENTE</div>
                 <div class="form-dots">
@@ -1115,8 +1132,6 @@
                 <div class="stat-row"><span class="stat-key">Diff. buts</span><span class="stat-val">{{ formatDiff(analysis.away_stats.goalDifference) }}</span></div>
                 <div class="stat-row"><span class="stat-key">V / N / D</span><span class="stat-val">{{ analysis.away_stats.wins }}V {{ analysis.away_stats.draws }}N {{ analysis.away_stats.losses }}D</span></div>
               </div>
-
-              <!-- NOUVEAU - Stats avancées (xG, discipline) -->
               <div class="advanced-stats" v-if="analysis.away_advanced">
                 <div class="stat-card-title" style="margin-bottom:8px">📈 STATS AVANCÉES</div>
                 <div class="stat-rows">
@@ -1126,13 +1141,9 @@
                   <div class="stat-row"><span class="stat-key">🟥 Cartons rouges</span><span class="stat-val">{{ analysis.away_advanced.red_cards }}</span></div>
                 </div>
               </div>
-
-              <!-- NOUVEAU - Blessures -->
               <div class="injuries-section" v-if="analysis.away_injuries">
                 <div class="stat-card-title" style="margin-bottom:8px">🏥 BLESSURES</div>
-                <div v-if="analysis.away_injuries.length === 0" class="no-injuries">
-                  ✅ Aucune blessure majeure
-                </div>
+                <div v-if="analysis.away_injuries.length === 0" class="no-injuries">✅ Aucune blessure majeure</div>
                 <div v-else>
                   <div v-for="injury in analysis.away_injuries" :key="injury.player" class="injury-item">
                     <span class="injury-icon">❌</span>
@@ -1141,7 +1152,6 @@
                   </div>
                 </div>
               </div>
-
               <div style="margin-top: 16px;">
                 <div class="stat-card-title" style="margin-bottom:8px">FORME RÉCENTE</div>
                 <div class="form-dots">
@@ -1200,6 +1210,20 @@
             </div>
           </div>
 
+          <!-- Bouton PDF bas de page -->
+          <div style="display:flex; justify-content:center; padding: 16px 0 40px;">
+            <button
+              class="pdf-btn"
+              :class="{ loading: generatingPdf }"
+              :disabled="generatingPdf"
+              @click="downloadPdf"
+              style="font-size:0.85rem; padding:14px 28px;"
+            >
+              <span v-if="generatingPdf" class="pdf-btn-spinner"></span>
+              <span v-else class="pdf-btn-icon">📄</span>
+              {{ generatingPdf ? 'GÉNÉRATION EN COURS...' : 'TÉLÉCHARGER LE RAPPORT PDF COMPLET' }}
+            </button>
+          </div>
         </div>
 
         <div v-if="error" style="text-align:center; padding:40px; color:var(--red); font-family:var(--font-mono); font-size:0.85rem">
@@ -1226,6 +1250,7 @@ createApp({
     const analysis = ref(null)
     const loadingMatches = ref(false)
     const loadingAnalysis = ref(false)
+    const generatingPdf = ref(false)
     const error = ref('')
 
     const leagueEmoji = (code) => {
@@ -1280,6 +1305,10 @@ createApp({
       }
     }
 
+    const selectMatch = (match) => {
+      selectedMatch.value = match
+    }
+
     const analyzeMatch = async (match) => {
       selectedMatch.value = match
       analysis.value = null
@@ -1300,11 +1329,45 @@ createApp({
       }
     }
 
+    // ── NOUVEAU : Téléchargement du rapport PDF ───────────────────────────
+    const downloadPdf = async () => {
+      if (!selectedMatch.value || !selectedLeague.value) return
+      generatingPdf.value = true
+      error.value = ''
+      try {
+        const url = `${API}/report/${selectedMatch.value.id}/${selectedLeague.value.code}`
+        const r = await fetch(url)
+        if (!r.ok) {
+          const body = await r.json().catch(() => ({}))
+          throw new Error(body.error || 'HTTP ' + r.status)
+        }
+        // Récupérer le nom du fichier depuis le header Content-Disposition
+        const disposition = r.headers.get('Content-Disposition') || ''
+        const match = disposition.match(/filename="?([^"]+)"?/)
+        const filename = match ? match[1] : 'PredictaBall_rapport.pdf'
+
+        // Créer un lien de téléchargement temporaire
+        const blob = await r.blob()
+        const blobUrl = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = blobUrl
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(blobUrl)
+      } catch(e) {
+        error.value = 'Erreur génération PDF : ' + e.message
+      } finally {
+        generatingPdf.value = false
+      }
+    }
+
     return {
       step, leagues, selectedLeague, matches, selectedMatch, analysis,
-      loadingMatches, loadingAnalysis, error,
+      loadingMatches, loadingAnalysis, generatingPdf, error,
       leagueEmoji, formatDate, formatDiff,
-      selectLeague, analyzeMatch,
+      selectLeague, selectMatch, analyzeMatch, downloadPdf,
       goBackToLeagues, goBackToMatches
     }
   }
